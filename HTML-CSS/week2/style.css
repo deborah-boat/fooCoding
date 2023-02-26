@@ -45,7 +45,6 @@ img {
 	display: grid;
 	gap: 1rem;
 	grid-template-columns: 1fr 1fr;
-	background: rgb(46, 79, 92);
 }
 
 ul li:first-child {
@@ -66,7 +65,7 @@ ul li:first-child {
 		display: grid;
 		grid-template-columns: repeat(6, 1fr);
 		gap: 1rem;
-		background: rgba(87, 49, 175, 0.662);
+	
 	}
 	ul li:first-child {
 		grid-column: span 3;
@@ -89,7 +88,7 @@ ul li:first-child {
 		display: grid;
 		grid-template-columns: repeat(12, 1fr);
 		gap: 1rem;
-		background: rgba(6, 97, 56, 0.626);
+	
 	}
 	ul li:first-child {
 		grid-column: span 6;
