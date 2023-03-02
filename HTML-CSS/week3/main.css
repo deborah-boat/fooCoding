@@ -293,7 +293,7 @@ footer {
 	text-align: center;
 }
 
-.footer-col {
+.footer {
 	width: 100%;
 }
 
@@ -321,7 +321,7 @@ footer {
 		padding-bottom: 46px;
 	}
 
-	.footer-col {
+	.footer {
 		width: 50%;
 		margin-bottom: 30px;
 	}
