@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Rajdhani&family=Roboto&family=Rubik+Mono+One&display=swap');
+
 *,
 *:before,
 *:after {
@@ -9,7 +9,6 @@
 .header-list {
 	list-style: none;
 	display: flex;
-	flex-direction: row;
 	font-family: Arial, Helvetica, sans-serif;
 	padding-left: 16px;
 	padding-top: 15px;
@@ -142,13 +141,13 @@ a:hover {
 }
 
 .head-first-section {
-	font-family: 'Rajdhani';
+	font-family:Arial ;
 	color: rgb(255, 255, 255);
 	font-size: 20px;
 	padding: 10px;
 }
 .p-first-section {
-	font-family: 'Rubik Mono One';
+	font-family: Arial;
 	color: rgb(255, 255, 255);
 	font-size: 25px;
 	padding: 10px;
@@ -163,7 +162,7 @@ a:hover {
 }
 
 .header-popularstories {
-	font-family: 'Archivo Black';
+	font-family: Aria;
 	font-size: 50px;
 	text-align: center;
 	padding-top: 48px;
@@ -189,7 +188,7 @@ a:hover {
 	margin-top: 15px;
 }
 .header-lastnews {
-	font-family: 'Archivo black';
+	font-family: 'Arial;
 	font-size: 50px;
 	padding-left: 30px;
 	padding-right: 30px;
@@ -465,13 +464,13 @@ a:hover {
 }
 
 .head-first-section {
-	font-family: 'Rajdhani';
+	font-family: Arial;
 	color: rgb(255, 255, 255);
 	font-size: 20px;
 	padding: 10px;
 }
 .p-first-section {
-	font-family: 'Rubik Mono One';
+	font-family: Arial;
 	color: rgb(255, 255, 255);
 	font-size: 25px;
 	padding: 10px;
@@ -486,7 +485,7 @@ a:hover {
 }
 
 .header-popularstories {
-	font-family: 'Archivo Black';
+	font-family: 'Arial;
 	font-size: 50px;
 	text-align: center;
 	padding-top: 48px;
@@ -512,7 +511,7 @@ a:hover {
 	margin-top: 15px;
 }
 .header-lastnews {
-	font-family: 'Archivo black';
+	font-family: Arial;
 	font-size: 50px;
 	padding-left: 30px;
 	padding-right: 30px;
