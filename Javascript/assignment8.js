@@ -20,12 +20,12 @@ console.log(typeof bool);
 console.log(typeof array);
 
 if (
-	typeof string == typeof array ||
-	typeof num == typeof bool ||
-	typeof bool == typeof array ||
-	typeof array == typeof num ||
-	typeof num == typeof bool ||
-	typeof str == typeof array
+	typeof string === typeof array ||
+	typeof num === typeof bool ||
+	typeof bool === typeof array ||
+	typeof array === typeof num ||
+	typeof num === typeof bool ||
+	typeof str === typeof array
 ) {
 	console.log('Same type');
 } else {
