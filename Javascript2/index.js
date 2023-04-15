@@ -1,4 +1,3 @@
-
 const bookTitles = ["harry_potter", 
 "lord_of_the_rings", 
 "catcher_in_the_rye", 
@@ -77,8 +76,6 @@ const booksImages = {
     cinderella:"img/cinderella.jpg",
 };
 
-  
-
 
 const body = document.body;
 const ul = document.createElement("ul");
@@ -87,53 +84,92 @@ const h1 = document.createElement('h1');
 h1.innerText = "10 Books i have read";
 body.appendChild(h1);
 
-// 1.3
 
 function listBooks(array, objet){
-  
-//   this code it's for 1.3
-//   
-//   
-  
-  // for(let i = 0; i < array.length; i++){
-  //   const li = document.createElement("li");
-  //   ul.appendChild(li);
-  //   li.setAttribute("id", array[i]);
-  // }
-//   
-//   
-// 1.5 I modify the create function in 1.3 to be able to do the one in 1.5
-  
-   for(let i = 0; i < array.length; i++){
+  for(let i = 0; i < array.length; i++){
     const li = document.createElement("li");
     ul.appendChild(li);
-     const text = array[i];
+    
+    const header = document.createElement("h1");
+    const text = array[i];
     li.appendChild(header);
     header.setAttribute("id", text);
-     header.innerText = objet[text].title;
+    header.innerText = objet[text].title;
+    
     const language = document.createElement("h2");
     li.appendChild(language);
     language.innerText = objet[text].language;
+    
     const author = document.createElement("h2");
-li.appendChild(author);
-author.innerText = objet[text].author;
-const img = document.createElement("img");
-li.appendChild(img);
-    img.src = booksImages[array[i]];
-    img.setAttribute("alt",objet[text].title);
+    li.appendChild(author);
+    author.innerText = objet[text].author;
+    
+    const img = document.createElement("img");
+    li.appendChild(img);
+    img.src = booksImages[text];
+    img.setAttribute("alt", objet[text].title);
   }
-  
- }
-
-
-
-  
- 
+}
 
 
 
 
 listBooks(bookTitles,booksList);
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+       
+
+
+ 
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
