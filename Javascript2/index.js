@@ -104,21 +104,21 @@ function listBooks(array, objet){
 //   
 // 1.5 I modify the create function in 1.3 to be able to do the one in 1.5
   
-       const keys = Object.keys(objet)
    for(let i = 0; i < array.length; i++){
-    const header = document.createElement("h1");
-     const text = keys[i];
-    body.appendChild(header);
-    header.setAttribute("id", array[i]);
+    const li = document.createElement("li");
+    ul.appendChild(li);
+     const text = array[i];
+    li.appendChild(header);
+    header.setAttribute("id", text);
      header.innerText = objet[text].title;
     const language = document.createElement("h2");
-    body.appendChild(language);
+    li.appendChild(language);
     language.innerText = objet[text].language;
     const author = document.createElement("h2");
-body.appendChild(author);
+li.appendChild(author);
 author.innerText = objet[text].author;
 const img = document.createElement("img");
-body.appendChild(img);
+li.appendChild(img);
     img.src = booksImages[array[i]];
     img.setAttribute("alt",objet[text].title);
   }
