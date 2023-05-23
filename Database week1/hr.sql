@@ -49,7 +49,7 @@ values
   ('Jennifer', 'Cat', 'Sound Producer', 543216, 'Art', '2020-09-10'), 
   ('Claudia', 'Simpson', 'Son of Homer', 543216, 'Simpsons', '1999-02-11'), 
   ('Lissa', 'Simpson', 'Daughter of Homer', 654765, 'Simpsons', '1999-02-11'), 
-  ('Ekow', 'Simpson', 'Father', 333333, 'Simpsons', '1999-02-11'),
+  ('Ekow', 'Sampson', 'Father', 333333, 'Simpsons', '1999-02-11'),
   ('Beatrice', 'Nobody Knows', 'Son', 333333, 'Family Guy', '2000-02-03')
 ;
 
