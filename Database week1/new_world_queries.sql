@@ -11,7 +11,7 @@ WHERE country.name LIKE '%land%';
 -- 3. What are the names of the cities with population in between 500,000 and 1 million ?
 SELECT name, population
 FROM country
-WHERE population between 500000 and 1000000;
+WHERE population BETWEEN 500000 AND 1000000;
 
 -- 4. What's the name of all the countries on the continent ‘Europe’ ?
 SELECT name, continent 
@@ -38,12 +38,12 @@ WHERE name = 'Rotterdam';
 -- 8. What's the top 10 countries by Surface Area ?
 SELECT name, surfacearea
 FROM country
-ORDER BY surfacearea DESC limit 10;
+ORDER BY surfacearea DESC LIMIT 10;
 
 -- 9. What's the top 10 most populated cities?
 SELECT name, population 
 FROM city
-ORDER BY population DESC limit 10;
+ORDER BY population DESC LIMIT 10;
 
 -- 10. What is the population of the world ?
 SELECT SUM(population)AS world_population FROM country;
