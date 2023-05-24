@@ -45,3 +45,26 @@ ORDER BY population DESC LIMIT 10;
 
 -- 10. What is the population of the world ?
 SELECT SUM(population)AS world_population FROM country;
+
+
+--->EXTRA: Give me the names of the countries that has more than 10 cities, and a total population of the cities listed (not the country population) of more than 50 million.
+
+SELECT country.name 
+FROM country
+INNER JOIN city
+ON country.code = city.countrycode
+GROUP BY countrycode HAVING COUNT(*) > 10 AND SUM(city.population) > 50000000;
+
+
+--->EXTRA EXTRA: List the cities from those countries, where the city population is > 5M.
+
+SELECT city.name, country.name, population
+FROM cities
+WHERE population > 5000000;
+
+
+
+
+
+
+
