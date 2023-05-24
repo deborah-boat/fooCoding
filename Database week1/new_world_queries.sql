@@ -24,11 +24,9 @@ FROM country
 ORDER BY surfacearea DESC;
 
 -- 6. What are the names of all the cities in the Netherlands?
-SELECT city.name, country.name
-FROM city inner 
-JOIN country
-ON city.countrycode = country.code
-WHERE country.name = 'Netherlands';
+SELECT name
+FROM city 
+WHERE countrycode = 'NLD';
 
 -- 7. What is the population of Rotterdam ?
 SELECT name, population
