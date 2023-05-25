@@ -7,9 +7,11 @@ use HR;
 drop table if exists location;
 create table location (
   location_id int not null auto_increment,
+  country varchar(255),
   city varchar(255),
   street varchar(255),
   postal_code varchar(255),
+  employee_id int not null,
 ); 
 
 show tables;
@@ -22,7 +24,10 @@ create table employee (
   employee_id int not null auto_increment,
   first_name varchar(255),
   last_name varchar(255),
+  title varchar(255),
   salary INT,
+  department varchar(255),
+  start_date varchar(255),
   -- constraints
   primary key(location_id),
   foreign key(employee_id)
