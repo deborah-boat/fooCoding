@@ -1,22 +1,7 @@
 -- 1. Create database HR;
 create database HR;
 
---2. Create table locations;
-drop table if exists locations;
-create table locations (
-  location_id int not null auto_increment,
-  country varchar(255),
-  city varchar(255),
-  street varchar(255),
-  postal_code varchar(255),
-  employee_id int not null,
-  -- constraints
-  primary key(location_id),
-  foreign key(employee_id)
-    references employee(employee_id)
-);
-
--- 3. Create table employee;
+-- 2. Create table employee;
 use HR;
 
 drop table if exists employee;
@@ -34,6 +19,22 @@ create table employee (
 show tables;
 describe locations;
 describe employee;
+
+--3. Create table locations;
+drop table if exists locations;
+create table locations (
+  location_id int not null auto_increment,
+  country varchar(255),
+  city varchar(255),
+  street varchar(255),
+  postal_code varchar(255),
+  employee_id int not null,
+  -- constraints
+  primary key(location_id),
+  foreign key(employee_id)
+    references employee(employee_id)
+);
+
 
 -- 4. Insert 10-20 rows in each table with relevant fields. (Make sure that you have relevant relations)
 -- Relations: Employee has many locations
