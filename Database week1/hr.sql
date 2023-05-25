@@ -4,31 +4,24 @@ create database HR;
 -- 2. Create table employee;
 use HR;
 
-drop table if exists employee;
-create table employee (
-  employee_id int not null auto_increment,
-  first_name varchar(255) not null,
-  last_name varchar(255) not null,
-  title varchar(255) not null,
-  salary int not null,
-  department varchar(255) not null,
-  start_date date not null,
-  -- constraints
+drop table if exists location;
+create table location (
+  location_id int not null auto_increment,
+  city varchar(255),
+  street varchar(255),
   primary key(employee_id)
 ); 
 show tables;
 describe locations;
 describe employee;
 
---3. Create table locations;
-drop table if exists locations;
-create table locations (
-  location_id int not null auto_increment,
-  country varchar(255),
-  city varchar(255),
-  street varchar(255),
-  postal_code varchar(255),
-  employee_id int not null,
+--3. Create table employee;
+drop table if exists employee;
+create table employee (
+  employee_id int not null auto_increment,
+  first_name varchar(255),
+  last_name varchar(255),
+  salary INT,
   -- constraints
   primary key(location_id),
   foreign key(employee_id)
