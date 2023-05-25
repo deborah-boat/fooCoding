@@ -9,8 +9,9 @@ create table location (
   location_id int not null auto_increment,
   city varchar(255),
   street varchar(255),
-  primary key(employee_id)
+  postal_code varchar(255),
 ); 
+
 show tables;
 describe locations;
 describe employee;
