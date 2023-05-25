@@ -63,13 +63,12 @@ ORDER BY total_city_population ASC;
 --->EXTRA EXTRA: List the cities from those countries, where the city population is > 5M.
 
 SELECT city.name, city.population
-FROM country
-JOIN city ON country.code = city.countrycode
-WHERE country.name IN (
-  SELECT country.name
+FROM city
+WHERE countrycode IN (
+  SELECT country.code
   FROM country
-  JOIN city ON country.code = city.countrycode
-  GROUP BY country.name
+  INNER JOIN city ON country.code = city.countrycode
+  GROUP BY country.code
   HAVING COUNT(city.name) > 10 AND SUM(city.population) > 50000000
 )
 AND city.population > 5000000
