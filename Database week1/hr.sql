@@ -15,7 +15,7 @@ create table employee (
   department varchar(255) not null,
   start_date date not null,
   location_id int
-  
+  --constraints
   primary key(id)
   foreign key(location_id)
   reference location(id)
