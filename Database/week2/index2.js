@@ -13,7 +13,7 @@ const connection = mysql.createConnection({
 });
 
 
-
+  // Prompt for user input
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -58,194 +58,101 @@ function showMenu() {
 }
 showMenu();
 
-function exitApp() {
-  console.log('Exiting...');
-  connection.end();
-  rl.close();
+// Utility function to ask a question and return the user's input
+function askQuestion(rl, question) {
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      resolve(answer);
+    });
+  });
 }
 
-// 1. Get Capital after entering country
-function getCapitalCity() {
-  // Drop the existing stored procedure if it exists
-  const dropProcedure = 'DROP PROCEDURE IF EXISTS GetCapitalCity';
-  const createProcedure = `
-    CREATE PROCEDURE GetCapitalCity(IN countryName VARCHAR(255))
-    BEGIN
-      SET @query = CONCAT('SELECT city.name AS city_name FROM city INNER JOIN country ON city.ID = country.Capital WHERE country.Name = ', QUOTE(countryName));
-      PREPARE stmt FROM @query;
-      EXECUTE stmt;
-      DEALLOCATE PREPARE stmt;
-    END`;
+// Get the capital of a country
+function getCapital(countryName) {
+  const query = 'SELECT city.name AS capital FROM country INNER JOIN city ON country.capital = city.id WHERE country.name = ?';
 
-  connection.query(dropProcedure, (err) => {
-    if (err) {
-      console.error('Failed to drop stored procedure:', err);
-      return;
-    }
-
-    connection.query(createProcedure, (err) => {
+  return new Promise((resolve, reject) => {
+    connection.query(query, [countryName], (err, results) => {
       if (err) {
-        console.error('Failed to create stored procedure:', err);
-        return;
+        reject(err);
+      } else {
+        if (results.length === 0) {
+          console.log('Country not found');
+        } else {
+          const capital = results[0].capital;
+          console.log(`Capital of ${countryName}: ${capital}`);
+        }
+        resolve();
       }
-
-      rl.question('Enter country name to get capital name: ', (countryName) => {
-        const callProcedure = 'CALL GetCapitalCity(?)';
-        connection.query(callProcedure, [countryName], (err, results) => {
-          if (err) {
-            console.error('Failed to call stored procedure:', err);
-            return;
-          }
-
-          if (results[0].length > 0) {
-            const capitalCity = results[0][0].city_name;
-            console.log('Capital City:', capitalCity);
-          } else {
-            console.log('No capital city found for the specified country.');
-          }
-
-          const dropProcedure = 'DROP PROCEDURE IF EXISTS GetCapitalCity';
-          connection.query(dropProcedure, (err) => {
-            if (err) {
-              console.error('Failed to drop stored procedure:', err);
-            }
-            showMenu();
-          });
-        });
-      });
     });
   });
 }
 
+// List all languages spoken in a region
+function listLanguagesInRegion(regionName) {
+  const query = 'SELECT DISTINCT cl.language FROM country c  INNER JOIN countrylanguage cl ON c.code = cl.countrycode WHERE c.region = ?';
 
-// 2. Function to prompt for region name
-function getLanguage() {
-  // Drop the existing stored procedure if it exists
-  const dropProcedure = 'DROP PROCEDURE IF EXISTS GetLanguagesByRegion';
-  connection.query(dropProcedure, (err) => {
-    if (err) {
-      console.error('Failed to drop stored procedure:', err);
-      return;
-    }
-    const createProcedure = `
-      CREATE PROCEDURE GetLanguagesByRegion(IN regionName VARCHAR(255))
-      BEGIN
-        SET @query = CONCAT('SELECT DISTINCT language AS language FROM countrylanguage INNER JOIN country ON country.Code = countrylanguage.CountryCode WHERE country.Region = ', QUOTE(regionName));
-        PREPARE stmt FROM @query;
-        EXECUTE stmt;
-        DEALLOCATE PREPARE stmt;
-      END`;
-
-    connection.query(createProcedure, (err) => {
+  return new Promise((resolve, reject) => {
+    connection.query(query, [regionName], (err, results) => {
       if (err) {
-        console.error('Failed to create stored procedure:', err);
-        return;
+        reject(err);
+      } else {
+        if (results.length === 0) {
+          console.log('No languages found');
+        } else {
+          const languages = results.map((row) => row.language);
+          console.log(`Languages spoken in ${regionName}: ${languages.join(', ')}`);
+        }
+        resolve();
       }
-
-      rl.question('Enter region name to get languages: ', (regionName) => {
-        const callProcedure = 'CALL GetLanguagesByRegion(?)';
-        connection.query(callProcedure, [regionName], (err, results) => {
-          if (err) {
-            console.error('Failed to call stored procedure:', err);
-            return;
-          }
-
-          if (results[0].length > 0) {
-            console.log('Languages in the selected region:');
-            results[0].forEach((row) => {
-              console.log(row.language);
-            });
-          } else {
-            console.log('No languages found for the specified region.');
-          }
-
-          const dropProcedure = 'DROP PROCEDURE IF EXISTS GetLanguagesByRegion';
-          connection.query(dropProcedure, (err) => {
-            if (err) {
-              console.error('Failed to drop stored procedure:', err);
-            }
-            showMenu();
-          });
-        });
-      });
     });
   });
 }
 
+// Get the number of cities where a language is spoken
+function countCitiesWithLanguage(language) {
+  const query = 'SELECT COUNT(DISTINCT city.id) AS cityCount FROM city INNER JOIN countrylanguage ON city.CountryCode = countrylanguage.CountryCode WHERE countrylanguage.Language = ?';
 
-// 3. Find the number of cities that speak language Z
-function getCityCountByLanguage() {
-  // Drop the existing stored procedure if it exists
-  const dropProcedure = 'DROP PROCEDURE IF EXISTS GetCityCountByLanguage';
-  const createProcedure = `
-    CREATE PROCEDURE GetCityCountByLanguage(IN languageCode VARCHAR(255))
-    BEGIN
-      SET @query = CONCAT('SELECT COUNT(DISTINCT city.Name) AS city_count FROM countrylanguage JOIN city ON countrylanguage.CountryCode = city.CountryCode WHERE countrylanguage.Language = ', QUOTE(languageCode));
-      PREPARE stmt FROM @query;
-      EXECUTE stmt;
-      DEALLOCATE PREPARE stmt;
-    END`;
-
-  connection.query(dropProcedure, (err) => {
-    if (err) {
-      console.error('Failed to drop stored procedure:', err);
-      return;
-    }
-
-    connection.query(createProcedure, (err) => {
+  return new Promise((resolve, reject) => {
+    connection.query(query, [language], (err, results) => {
       if (err) {
-        console.error('Failed to create stored procedure:', err);
-        return;
+        reject(err);
+      } else {
+        const cityCount = results[0].cityCount;
+        console.log(`Number of cities where ${language} is spoken: ${cityCount}`);
+        resolve();
       }
+    });
+  });
+}
 
-      rl.question('Enter language to get number cities that speak this languages: ', (languageCode) => {
-        const callProcedure = 'CALL GetCityCountByLanguage(?)';
-        connection.query(callProcedure, [languageCode], (err, results) => {
-          if (err) {
-            console.error('Failed to call stored procedure:', err);
-            return;
-          }
+// List all continents with the number of languages spoken in each continent
+function listContinentsWithLanguageCount() {
+  const query = 'SELECT continent, COUNT(DISTINCT language) AS language_count FROM country INNER JOIN countrylanguage ON country.Code = countrylanguage.CountryCode GROUP BY continent';
 
-          const cityCount = results[0][0].city_count;
-          console.log('Number of cities where selected language is spoken:', cityCount);
-
-          const dropProcedure = 'DROP PROCEDURE IF EXISTS GetCityCountByLanguage';
-          connection.query(dropProcedure, (err) => {
-            if (err) {
-              console.error('Failed to drop stored procedure:', err);
-            }
-            showMenu();
-          });
+  return new Promise((resolve, reject) => {
+    connection.query(query, (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        results.forEach((row) => {
+          console.log(`${row.continent}: ${row.language_count} languages`);
         });
-      });
+        resolve();
+      }
     });
   });
 }
-getCityCountByLanguage();
 
-// 4. List all the continents with the number of languages spoken in each continent
-
-function getLanguageCountByContinent() {
-  const query = `
-    SELECT country.Continent, COUNT(DISTINCT countrylanguage.Language) AS language_count
-    FROM country
-    JOIN countrylanguage ON country.Code = countrylanguage.CountryCode
-    GROUP BY country.Continent
-  `;
-
-  connection.query(query, (err, results) => {
+// Close the database connection
+function closeConnection() {
+  connection.end((err) => {
     if (err) {
-      console.error('Failed to fetch language count by continent:', err);
-      return;
+      console.error('Error closing connection:', err);
     }
-
-    console.log('Language count by continent:');
-    results.forEach((row) => {
-      console.log(`Continent: ${row.Continent}, Number of languages spoken: ${row.language_count}`);
-    });
-    showMenu();
   });
 }
+
 
 // 5. Check official language and continent
 function getCountriesSame() {
