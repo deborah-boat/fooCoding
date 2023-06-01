@@ -146,3 +146,84 @@ function closeConnection() {
     }
   });
 }
+
+
+// 5. For the country given as input, is there any countries that have the same official language is in the same continent
+function readsqlQuestion5Input() {
+  const interface = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  return new Promise((resolve) =>
+    interface.question("Please provide country name to get other countries with same official languages and same continent: ", (answer) => {
+      interface.close();
+      resolve(answer);
+    })
+  );
+}
+
+let getCountriesSameLanguage = async function () {
+  const sameLanguages = await readsqlQuestion5Input();
+
+  // For the country given as input, find countries with the same official language and other countries in the same continent
+  connection.execute(
+    `SELECT
+      CONCAT("Countries with the same official language as ", ?, ": ", IFNULL(GROUP_CONCAT(DISTINCT c1.Name SEPARATOR ", "), "")) AS LanguageMatch,
+      CONCAT("Other countries in the same continent as ", ?, ": ", IFNULL(GROUP_CONCAT(DISTINCT c2.Name SEPARATOR ", "), "")) AS ContinentMatch
+    FROM
+      country AS c1
+    JOIN
+      countrylanguage AS cl1 ON c1.Code = cl1.CountryCode
+    JOIN
+      country AS c2 ON c1.Continent = c2.Continent
+    WHERE
+      cl1.IsOfficial = "T" AND
+      c1.Name <> ? AND
+      cl1.Language IN (
+        SELECT
+          cl2.Language
+        FROM
+          country AS c3
+        JOIN
+          countrylanguage AS cl2 ON c3.Code = cl2.CountryCode
+        WHERE
+          c3.Name = ? AND
+          cl2.IsOfficial = "T"
+      )
+    GROUP BY
+      c1.Code`,
+    [sameLanguages, sameLanguages, sameLanguages, sameLanguages],
+    function (err, results, fields) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+
+      if (results.length > 0) {
+        console.log(results[0].LanguageMatch);
+        console.log(results[0].ContinentMatch);
+      } else {
+        console.log("No matching countries found.");
+      }
+    }
+  );
+
+  connection.on("error", function () {
+    console.log("connection error");
+  });
+
+  // read inputs again
+  return await readInput();
+};
+
+
+
+
+
+
+
+
+
+
+
