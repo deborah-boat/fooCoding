@@ -34,7 +34,6 @@ CREATE TABLE User (
 CREATE TABLE TagItems (
        tag_item_id INT,
       tag_id INT,
-       description VARCHAR(255),
      FOREIGN KEY (tag_id) REFERENCES Tags(tag_id)
        FOREIGN KEY (item_id) REFERENCES ListItems(item_id)
      );
