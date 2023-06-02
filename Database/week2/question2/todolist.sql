@@ -26,7 +26,6 @@ CREATE TABLE User (
      
  CREATE TABLE Tags (
      tag_id INT PRIMARY KEY,
-     item_id INT,
      tag_name VARCHAR(50) NOT NULL,
      );
     
