@@ -33,5 +33,5 @@ CREATE TABLE TagItems (
        tag_item_id INT,
       tag_id INT,
      FOREIGN KEY (tag_id) REFERENCES Tags(tag_id)
-       FOREIGN KEY (item_id) REFERENCES ListItems(item_id)
+       FOREIGN KEY (item_id) REFERENCES ToDoList(list_id)
      );
