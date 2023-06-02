@@ -28,7 +28,6 @@ CREATE TABLE User (
      tag_id INT PRIMARY KEY,
      item_id INT,
      tag_name VARCHAR(50) NOT NULL,
-      REFERENCES Items(item_id)
      );
     
 CREATE TABLE TagItems (
