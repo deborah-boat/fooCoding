@@ -16,6 +16,7 @@ Add a reminder for the list (not for the item)
 ## MySQL ToDo App With Node.js
 This is a simple Node.js application that demonstrates how to use MySQL with prepared statements to create a ToDo app. It provides an API for managing ToDo lists and items.
 
+
 ### Notes
 * Make sure you have todo_database created
 
@@ -23,7 +24,8 @@ This is a simple Node.js application that demonstrates how to use MySQL with pre
 
 * test with postman
 
-### POINTS
+
+### Usage
 Start the server:
 
 use "node index.js" command the server will start running on http://localhost:3000.
