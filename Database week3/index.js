@@ -104,3 +104,26 @@ app.put('/completed', (req, res) => {
   );
 });
 
+  // Add reminder to the list
+  app.post(`/:userId/lists/:listId/reminders`, (req, res) => {
+    db.execute(
+        'insert into listreminders (remind_date, list_id) values (2024-18-02,?)',
+        [req.body.listId, rq.body.remind_date],
+        function (err, results, fields) {
+            console.log(results);
+            res.send(results);
+        },
+    );
+  });
+
+
+
+
+
+
+
+
+
+
+
+
