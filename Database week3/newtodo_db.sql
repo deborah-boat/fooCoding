@@ -30,7 +30,7 @@ CREATE TABLE `todo_database`.`users` (
   CREATE TABLE Reminders (
   id INT AUTO_INCREMENT PRIMARY KEY,
   `list_id` INT NOT NULL,
-  reminder_date DATE NOT NULL,
+  `reminder_date` DATE NOT NULL,
   FOREIGN KEY (`list_id`) REFERENCES TodoLists(`id`)
 );
   
