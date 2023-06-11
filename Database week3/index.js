@@ -1,18 +1,15 @@
 const express = require('express');
+const mysql = require("mysql2/promise");
 const cron = require("node-cron");
 
 
-const bodyParser = require("body-parser");
-const mysql = require('mysql2');
-let currentUser = null;
 
 //create MYSQL connection 
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'Mrsowusu@92',
-  database: 'todo_database',
-  connectionlimit: 10
+  database: 'todo_database'
 });
 
 // Create the Express server
