@@ -1,5 +1,5 @@
-CREATE DATABASE ToDoList;
-USE ToDoList;
+CREATE DATABASE ToDo;
+USE ToDo;
 
  -- Create the Users table
 CREATE TABLE Users (
