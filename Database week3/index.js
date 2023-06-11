@@ -16,6 +16,8 @@ const db = mysql.createConnection({
 const app = express();
 app.use(express.json());
 
+
+
 // Create a new list
 app.post("/lists", async (req, res) => {
   const { userId, name } = req.body;
