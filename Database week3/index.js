@@ -186,6 +186,12 @@ app.post("/lists/:listId/items/:itemId/reminders", async (req, res) => {
   }
 });
 
+//Middleware
+app.use(express.json());
+app.use((err, req, res) => {
+  res.status(500).json('Some error');
+});
+
 // Start the server
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
