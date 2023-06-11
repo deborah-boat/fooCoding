@@ -52,7 +52,7 @@ app.post("/lists", async (req, res) => {
 // Insert items in ToDo list
 app.post("/lists/:listId/items", async (req, res) => {
   const { listId } = req.params;
-  const { title, description, userId } = req.body;
+  const { items, description, userId } = req.body;
 
   try {
     const connection = await pool.getConnection();
@@ -71,8 +71,8 @@ app.post("/lists/:listId/items", async (req, res) => {
 
     // Insert the new item into the database
     const [result] = await connection.query(
-      "INSERT INTO Items (list_id, title, description) VALUES (?, ?, ?)",
-      [listId, title, description]
+      "INSERT INTO Items (list_id, item, description) VALUES (?, ?, ?)",
+      [listId, item, description]
     );
 
     const itemId = result.insertId;
