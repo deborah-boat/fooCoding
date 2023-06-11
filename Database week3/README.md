@@ -28,20 +28,17 @@ This is a simple Node.js application that demonstrates how to use MySQL with pre
 ### Usage
 Start the server:
 
-use "node index.js" command the server will start running on http://localhost:3000.
+#### API ENDPOINTS
 
-
-to set user post /user with "name":value in JSON format in request body
-
-to get users list get /lists with "name":value in JSON format in request body
-
-to delete item in list delete /deleteItem with "task_id":value in JSON format in request body
+to insert items post /lists with "name":value in JSON format in request body
 
 to delete list
-delete /deleteList with "list_id":value in JSON format in request body
+delete /list/:listid/items/:itemid :value in JSON format in request body
 
-to create list put /createList with user_id:value, list_name:value in JSON format in request body
+to create list post /lists/:listid/items :value in JSON format in request body
 
-to insert item in to do list put /insertItem with list_id:value, item:value in JSON format in request body
+to insert item in to do list put /lists/:listid/items/ :value in JSON format in request body
 
-to mark task as completed put /completed with completed:1 for true 0 for false, task_id:value in JSON format in request body
+to mark task as completed put /lists/:listid/items/:itemid :value in JSON format in request body
+
+to add reminder post /lists/items/:itemsid/reminders : value in JSON format in request body
