@@ -1,5 +1,6 @@
 const express = require('express');
-const app = express();
+const cron = require("node-cron");
+
 
 const bodyParser = require("body-parser");
 const mysql = require('mysql2');
@@ -11,118 +12,187 @@ const db = mysql.createConnection({
   user: 'root',
   password: 'Mrsowusu@92',
   database: 'todo_database',
+  connectionlimit: 10
 });
 
-app.listen('3000', () => {
-  console.log('Server started on port 3000');
-});
-
-db.connect((err) => {
-  if (err) {
-    throw err;
-  }
-  console.log('MySql Connected');
-});
-
+// Create the Express server
+const app = express();
 app.use(express.json());
 
-// set user
-app.post('/user', (req, res) => {
-  currentUser = req.body.name;
-  res.send('using user ' + currentUser);
-});
+// Create a new list
+app.post("/lists", async (req, res) => {
+  const { userId, name } = req.body;
 
-// get users lists
-app.get('/lists', (req, res) => {
-  db.execute(
-    'SELECT list_name,list_id from todos inner join users on users.user_id = todos.user_id where users.username = ?',
-    [req.body.name],
-    function (err, results, fields) {
-      console.log(results);
-      res.send(results);
-    },
-  );
-});
+  try {
+    const connection = await pool.getConnection();
 
-// delete item in to do list
-app.delete('/deleteItem', (req, res) => {
-  db.execute(
-    'DELETE FROM list_items WHERE task_id =?',
-    [req.body.task_id],
-    function (err, results, fields) {
-      console.log(results);
-      res.send(results);
-    },
-  );
-});
+    const [user] = await connection.query("SELECT * FROM Users WHERE id = ?", [
+      userId,
+    ]);
 
-// delete to do list
-app.delete('/deleteList', (req, res) => {
-  db.execute(
-    'DELETE FROM todos WHERE list_id = ?',
-    [req.body.list_id],
-    function (err, results, fields) {
-      console.log(results);
-      res.send(results);
-    },
-  );
-});
+    if (!user) {
+      connection.release();
+      return res.status(404).json({ error: "User not found" });
+    }
 
-// create list
-app.post('/createList', (req, res) => {
-  db.execute(
-    'INSERT INTO `todo_database`.`todos` (`user_id`, `list_name`) VALUES (?, ?)',
-    [req.body.user_id, req.body.list_name],
-    function (err, results, fields) {
-      console.log(results);
-      res.send(results);
-    },
-  );
-});
-
-// insert item in to do list
-app.put('/insertItem', (req, res) => {
-  db.execute(
-    'INSERT INTO `todo_database`.`list_items` (`list_id`, `item`, `completed`) VALUES (?, ?, 0)',
-    [req.body.list_id, req.body.item],
-    function (err, results, fields) {
-      console.log(results);
-      res.send(results);
-    },
-  );
-});
-
-// mark as completed
-app.put('/completed', (req, res) => {
-  db.execute(
-    'UPDATE list_items SET completed = ? WHERE task_id = ?',
-    [req.body.completed, req.body.task_id],
-    function (err, results, fields) {
-      console.log(results);
-      res.send(results);
-    },
-  );
-});
-
-  // Add reminder to the list
-  app.post(`/:userId/lists/:listId/reminders`, (req, res) => {
-    db.execute(
-        'insert into listreminders (remind_date, list_id) values (2024-18-02,?)',
-        [req.body.listId, rq.body.remind_date],
-        function (err, results, fields) {
-            console.log(results);
-            res.send(results);
-        },
+    // Insert the new list into the database
+    const [result] = await connection.query(
+      "INSERT INTO Lists (user_id, name, created_at) VALUES (?, ?, CURRENT_TIMESTAMP)",
+      [userId, name]
     );
-  });
 
+    const listId = result.insertId;
 
+    connection.release();
 
+    res.status(201).json({ "List created successfully", listId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ "Internal server error" });
+  }
+});
 
+// Insert items in ToDo list
+app.post("/lists/:listId/items", async (req, res) => {
+  const { listId } = req.params;
+  const { title, description, userId } = req.body;
 
+  try {
+    const connection = await pool.getConnection();
 
+    const [list] = await connection.query(
+      "SELECT * FROM Lists WHERE id = ? AND user_id = ?",
+      [listId, userId]
+    );
 
+    if (!list) {
+      connection.release();
+      return res
+        .status(404)
+        .json({ error: "List not found or does not belong to the user" });
+    }
 
+    // Insert the new item into the database
+    const [result] = await connection.query(
+      "INSERT INTO Items (list_id, title, description) VALUES (?, ?, ?)",
+      [listId, title, description]
+    );
+
+    const itemId = result.insertId;
+
+    connection.release();
+
+    res.status(201).json({ "Item created successfully", itemId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ "Internal server error" });
+  }
+});
+
+// Delete items in ToDo list
+app.delete("/lists/:listId/items/:itemId", async (req, res) => {
+  const { listId, itemId } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const connection = await pool.getConnection();
+
+    const [list] = await connection.query(
+      "SELECT * FROM Lists WHERE id = ? AND user_id = ?",
+      [listId, userId]
+    );
+
+    if (!list) {
+      connection.release();
+      return res
+        .status(404)
+        .json({ error: "List not found or does not belong to the user" });
+    }
+
+    // Delete the item from the database
+    await connection.query("DELETE FROM Items WHERE list_id = ? AND id = ?", [
+      listId,
+      itemId,
+    ]);
+
+    connection.release();
+
+    res.status(200).json({ "Item deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ "Internal server error" });
+  }
+});
+
+// Mark an item as completed
+app.patch("/lists/:listId/items/:itemId", async (req, res) => {
+  const { listId, itemId } = req.params;
+  const { isCompleted, userId } = req.body;
+
+  try {
+    const connection = await pool.getConnection();
+    const [list] = await connection.query(
+      "SELECT * FROM Lists WHERE id = ? AND user_id = ?",
+      [listId, userId]
+    );
+
+    if (!list) {
+      connection.release();
+      return res
+        .status(404)
+        .json({ "List not found or does not belong to the user" });
+    }
+    await connection.query(
+      "UPDATE Items SET is_completed = ? WHERE list_id = ? AND id = ?",
+      [isCompleted ? 1 : 0, listId, itemId]
+    );
+
+    connection.release();
+
+    res.status(200).json({ message: "Item updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Add a reminder for an "LIST"
+app.post("/lists/:listId/items/:itemId/reminders", async (req, res) => {
+  const { listId, itemId } = req.params;
+  const { reminderDate, userId } = req.body;
+
+  try {
+    const connection = await pool.getConnection();
+
+    const [list] = await connection.query(
+      "SELECT * FROM Lists WHERE id = ? AND user_id = ?",
+      [listId, userId]
+    );
+
+    if (!list) {
+      connection.release();
+      return res
+        .status(404)
+        .json({ error: "List not found or does not belong to the user" });
+    }
+    await connection.query(
+      "INSERT INTO Reminders (list_id, reminder_date) VALUES (?, ?)",
+      [itemId, reminderDate]
+    );
+
+    connection.release();
+
+    res.status(201).json({ message: "Reminder added successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Start the server
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
 
 
 
