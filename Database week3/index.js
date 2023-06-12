@@ -1,204 +1,151 @@
 const express = require('express');
-const mysql = require("mysql2/promise");
-const cron = require("node-cron");
+const mysql = require('mysql2/promise');
 
-
-
-//create MYSQL connection 
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'Mrsowusu@92',
-  database: 'todo_database'
-});
-
-// Create the Express server
+// Create express application
 const app = express();
 app.use(express.json());
 
+// Database connection
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: 'Mrsowusu',
+  database: 'todo'
+});
 
-
-// Create a new list
-app.post("/lists", async (req, res) => {
-  const { userId, name } = req.body;
-
+// Insert item(s) in ToDo list
+app.post('/todo_lists/:listId/items', async (req, res) => {
   try {
+    const {listId} = req.params;
+    const { user_id,list_name,reminder } = req.body;
+
     const connection = await pool.getConnection();
-
-    const [user] = await connection.query("SELECT * FROM Users WHERE id = ?", [
-      userId,
-    ]);
-
-    if (!user) {
-      connection.release();
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    // Insert the new list into the database
-    const [result] = await connection.query(
-      "INSERT INTO Lists (user_id, name, created_at) VALUES (?, ?, CURRENT_TIMESTAMP)",
-      [userId, name]
+    const result = await connection.query(
+      'INSERT INTO todo_lists (list_id, user_id, list_name, reminder) VALUES (?, ?, ?, ?)',
+      [listId, user_id, list_name,reminder]
     );
-
-    const listId = result.insertId;
 
     connection.release();
 
-    res.status(201).json({ "List created successfully", listId });
+    res.status(201).json({ message: 'Item inserted into todo_lists' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ "Internal server error" });
+    res.status(500).json({ error: 'Failed to insert item into todo_lists' });
   }
 });
 
-// Insert items in ToDo list
-app.post("/lists/:listId/items", async (req, res) => {
-  const { listId } = req.params;
-  const { items, description, userId } = req.body;
+// Delete item(s) from ToDo list
 
+app.delete('/todo_lists/:listId/items/:user_id', async (req, res) => {
   try {
+    
+    const {listId} = req.params;
+    const {user_id}  = req.params;
+    
     const connection = await pool.getConnection();
-
-    const [list] = await connection.query(
-      "SELECT * FROM Lists WHERE id = ? AND user_id = ?",
-      [listId, userId]
+    const result = await connection.query(
+      'DELETE FROM todo_lists WHERE list_id = ? AND user_id = ?',
+      [listId, user_id]
     );
-
-    if (!list) {
-      connection.release();
-      return res
-        .status(404)
-        .json({ error: "List not found or does not belong to the user" });
-    }
-
-    // Insert the new item into the database
-    const [result] = await connection.query(
-      "INSERT INTO Items (list_id, item, description) VALUES (?, ?, ?)",
-      [listId, item, description]
-    );
-
-    const itemId = result.insertId;
 
     connection.release();
 
-    res.status(201).json({ "Item created successfully", itemId });
+    
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: 'List deleted successfully' });
+    } else {
+      res.status(404).json({ message: 'List not found' });
+    }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ "Internal server error" });
+    console.error('Failed to delete list:', error);
+    res.status(500).send('Something went wrong. Please contact the administrator.');
   }
 });
 
-// Delete items in ToDo list
-app.delete("/lists/:listId/items/:itemId", async (req, res) => {
-  const { listId, itemId } = req.params;
-  const { userId } = req.body;
 
+// Create a new ToDo list
+app.post('/todo_lists', async (req, res) => {
   try {
+    const { user_id, list_name, reminder } = req.body;
+
     const connection = await pool.getConnection();
-
-    const [list] = await connection.query(
-      "SELECT * FROM Lists WHERE id = ? AND user_id = ?",
-      [listId, userId]
+    const result = await connection.query(
+      'INSERT INTO todo_lists (user_id, list_name, reminder) VALUES (?, ?, ?)',
+      [user_id, list_name, reminder]
     );
-
-    if (!list) {
-      connection.release();
-      return res
-        .status(404)
-        .json({ error: "List not found or does not belong to the user" });
-    }
-
-    // Delete the item from the database
-    await connection.query("DELETE FROM Items WHERE list_id = ? AND id = ?", [
-      listId,
-      itemId,
-    ]);
 
     connection.release();
 
-    res.status(200).json({ "Item deleted successfully" });
+    res.status(201).json({ id: result.insertId, message: 'ToDo list created' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ "Internal server error" });
+    res.status(500).json({ error: 'Failed to create ToDo list' });
+  }
+});
+
+// Delete a ToDo list
+app.delete('/todo_lists/:listId', async (req, res) => {
+  try {
+    const {listId}  = req.params;
+
+    const connection = await pool.getConnection();
+    const result = await connection.query(
+      'DELETE FROM todo_lists WHERE list_id = ?',
+      [listId]
+    );
+
+    connection.release();
+
+    res.status(200).json({ message: 'ToDo list deleted' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete ToDo list' });
   }
 });
 
 // Mark an item as completed
-app.patch("/lists/:listId/items/:itemId", async (req, res) => {
-  const { listId, itemId } = req.params;
-  const { isCompleted, userId } = req.body;
-
+app.put('/todo_lists/:listId/items/:itemId/complete', async (req, res) => {
   try {
-    const connection = await pool.getConnection();
-    const [list] = await connection.query(
-      "SELECT * FROM Lists WHERE id = ? AND user_id = ?",
-      [listId, userId]
-    );
+    const {listId} = req.params;
+    const {itemId}   = req.params;
 
-    if (!list) {
-      connection.release();
-      return res
-        .status(404)
-        .json({ "List not found or does not belong to the user" });
-    }
-    await connection.query(
-      "UPDATE Items SET is_completed = ? WHERE list_id = ? AND id = ?",
-      [isCompleted ? 1 : 0, listId, itemId]
+    const connection = await pool.getConnection();
+    const result = await connection.query(
+      'UPDATE todo_items SET completed = true WHERE list_id = ? AND item_id = ?',
+      [listId, itemId]
     );
 
     connection.release();
 
-    res.status(200).json({ message: "Item updated successfully" });
+    res.status(200).json({ message: 'Item marked as completed' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: 'Failed to mark item as completed' });
   }
 });
 
-// Add a reminder for an "LIST"
-app.post("/lists/:listId/items/:itemId/reminders", async (req, res) => {
-  const { listId, itemId } = req.params;
-  const { reminderDate, userId } = req.body;
-
+// Add a reminder for the list (not for the item)
+app.put('/todo_lists/:listId/reminder', async (req, res) => {
   try {
+    const {listId}  = req.params;
+    const { reminder } = req.body;
+
     const connection = await pool.getConnection();
-
-    const [list] = await connection.query(
-      "SELECT * FROM Lists WHERE id = ? AND user_id = ?",
-      [listId, userId]
-    );
-
-    if (!list) {
-      connection.release();
-      return res
-        .status(404)
-        .json({ error: "List not found or does not belong to the user" });
-    }
-    await connection.query(
-      "INSERT INTO Reminders (list_id, reminder_date) VALUES (?, ?)",
-      [itemId, reminderDate]
+    const result = await connection.query(
+      'UPDATE todo_lists SET reminder = ? WHERE list_id = ?',
+      [listId, reminder]
     );
 
     connection.release();
 
-    res.status(201).json({ message: "Reminder added successfully" });
+    res.status(200).json({ message: 'Reminder added to the ToDo list' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: 'Failed to add reminder to the ToDo list' });
   }
-});
-
-//Middleware
-app.use(express.json());
-app.use((err, req, res) => {
-  res.status(500).json('Some error');
 });
 
 // Start the server
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+app.listen(3049, () => {
+  console.log('Server is Connected');
 });
-
-
-
-
