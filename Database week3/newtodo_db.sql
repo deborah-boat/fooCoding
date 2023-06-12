@@ -1,5 +1,5 @@
 CREATE DATABASE ToDo;
-USE ToDo;
+
 
  -- Create the Users table
 CREATE TABLE Users (
