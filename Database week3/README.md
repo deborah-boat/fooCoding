@@ -30,15 +30,26 @@ Start the server:
 
 #### API ENDPOINTS
 
-to insert items post /lists with "name":value in JSON format in request body
+Insert item(s) in ToDo list. POST /todo_lists/:listId/items .
 
-to delete list
-delete /list/:listid/items/:itemid :value in JSON format in request body
+Create a new ToDo list POST /todo_lists Create a new ToDo list.
 
-to create list post /lists/:listid/items :value in JSON format in request body
+Get all ToDo lists GET /todo_lists: Retrieve all ToDo lists.
 
-to insert item in to do list put /lists/:listid/items/ :value in JSON format in request body
+Get a specific ToDo list GET /todo_lists/:listId: Retrieve a specific ToDo list by ID.
 
-to mark task as completed put /lists/:listid/items/:itemid :value in JSON format in request body
+Update a ToDo list PUT /todo_lists/:listId: Update a ToDo list by ID.
 
-to add reminder post /lists/items/:itemsid/reminders : value in JSON format in request body
+Delete a ToDo list DELETE /todo_lists/:listId: Delete a ToDo list by ID.
+
+Create a new ToDo item POST /todo_lists/:listId/items: Create a new ToDo item in a specific ToDo list.
+
+Update a ToDo item PUT /todo_lists/:listId/items/:itemId: Update a ToDo item in a specific ToDo list by item ID.
+
+Delete a ToDo item from ToDo list. DELETE /todo_lists/:listId/items/:user_id, Delete a ToDo item in a specific ToDo list by item ID.
+
+Mark an item as completed PUT /todo_lists/:listId/items/:itemId/complete
+
+Add a reminder for the list PUT /todo_lists/:listId/reminder'
+
+
